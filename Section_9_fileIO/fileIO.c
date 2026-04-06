@@ -75,9 +75,9 @@ int main()
 	fputc('\n', fp);
 	fprintf(fp, "x = %d\n", x);
 	fputs("Hello world!\n", fp);
-
-	fclose(fp);
-
+	/* !!!!-- CLOSING STDOUT WILL RESULT IN THE CODE STOPPING TO
+	DISPLAY OUTPUTS. STDOUT IS SIMPLY A TEMP FILE USED BY GCC
+	AND IF CLOSED WILL SIMPLY CEASE TO FUNCTION --!!!! */
 	// -- Readin Binaries -- 
 	// To interact a file binaries, simply add "b" in the mode "rb", "wb"
 	fp = fopen("output.bin", "wb");
@@ -89,8 +89,10 @@ int main()
 	fclose(fp);
 
 	fp = fopen("output.bin", "rb");
+
 	unsigned char k;
-	while (fread(&k, sizeof(char), 1, fp) > 0)
+	
+	while (fread(&k, sizeof(unsigned char), 1, fp) > 0)
 		printf("%d\n", k);
 
 	fclose(fp);
