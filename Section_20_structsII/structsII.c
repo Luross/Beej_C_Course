@@ -47,6 +47,40 @@ struct foo{
 	int c;
 	char d;
 };
+
+
+struct opti_foo{
+	int a:5; //number of BITS allocated for the variable
+	char b:5;//5bits is only 31 values !
+	int c:3; // 3 is only 7 !
+	char d:3;
+};
+struct parent {
+	int a, b;
+};
+
+struct child {
+	struct parent super;
+	// MUST be first
+	int c, d;
+};
+
+union union_foo {
+	int a, b, c, d, e, f;
+	float g, h;
+	char i, j, k, l;
+};
+
+struct foo return_foo(void)
+{
+	return (struct foo){.a=55, .c =33};//returning struct syntax !
+}
+
+void print_parent(void *p)
+{
+	struct parent *self = p;
+	printf("Parent: %d, %d\n", self->a, self->b);
+}
 int main()
 {
 	struct vending_machine my_machine = {
@@ -114,6 +148,33 @@ int main()
 	// indicates we use 4 bytes per data type, which is weird because int is only 1 byte, so there is 3 padding bytes that compiler adds for optimization
 
 	// -Fake OOP-
-	// TBC...
+	// By passing the pointer of a struct as the first pointer of another struct you can mimic OOP
+	//here you have a struct child that references the struct parent, which can be defined by refering to it in its definition without either creating a struct parent :
+	struct child C = {.super.a=1, .super.b=2, .c=3, .d=4};
+	print_parent(&C);//print parent works with a child struct !
+
+	// -bit-fields-
+	// for hyper optimization, you can reduce the number of bits allocated to a variable:
+
+	printf("Foo is %zu bytes \n", sizeof(struct foo));
+	printf("Opti_foo is %zu bytes \n", sizeof(struct opti_foo));
+
+	// -Unions -
+	// unions are like sturct but you can only use one field at a time
+	printf("Union_foo is %zu bytes \n", sizeof(union union_foo));
+
+	// unions can be useful if you have a struct where you know you will only use one member or another but not both at the same time, for example with a if conditional that will use only one or the other
+
+	//its very optimizy though
+
+	//I skip on the finer details on the unions, beej talks about how common initial sequence structs can be accessed from any member, which can be used for OOP
+	// It's a bit hard to wrap my head around it though
+
+	// also you can return structs :
+	// see test function above for the syntax :(sturct type){.member1= x, .member2= y};
+	struct foo return_test = return_foo();
+
+	printf("%d %d\n", return_test.a, return_test.c);
+
 	return 0;
 }
